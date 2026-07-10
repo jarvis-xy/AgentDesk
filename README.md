@@ -1,5 +1,7 @@
 # Token Ledger
 
+[简体中文](README.zh-CN.md)
+
 Token Ledger is a local-first dashboard for tracking AI coding token usage on your own computer.
 
 It scans local usage metadata from supported AI coding tools, aggregates token usage by day, tool, and model, and estimates cost from a configurable price table. It is designed for users who want to understand AI coding spend without uploading code, prompts, conversations, or file paths.
@@ -136,4 +138,3 @@ The primary open-source workflow is still `npm install && npm start`.
 ## License
 
 MIT
-
