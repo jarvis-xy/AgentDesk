@@ -1,0 +1,101 @@
+[
+  {
+    "model": "gpt-5.5",
+    "match": "^gpt-5\\.5",
+    "input": 5,
+    "cache": 0.5,
+    "output": 30,
+    "source": "official",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "gpt-5.4",
+    "match": "^gpt-5\\.4",
+    "input": 2.5,
+    "cache": 0.25,
+    "output": 15,
+    "source": "official",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "gpt-5.3-codex / codex-auto-review",
+    "match": "^gpt-5\\.3-codex|codex-auto-review",
+    "input": 1.75,
+    "cache": 0.175,
+    "output": 14,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "claude-opus",
+    "match": "^claude-opus",
+    "input": 5,
+    "cache": 0.5,
+    "cacheWrite": 6.25,
+    "output": 25,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "claude-sonnet",
+    "match": "^claude-sonnet",
+    "input": 3,
+    "cache": 0.3,
+    "cacheWrite": 3.75,
+    "output": 15,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "claude-haiku",
+    "match": "^claude-haiku",
+    "input": 1,
+    "cache": 0.1,
+    "cacheWrite": 1.25,
+    "output": 5,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "gemini-3.1-pro",
+    "match": "^gemini-3\\.1-pro",
+    "input": 1.25,
+    "cache": 0.125,
+    "output": 10,
+    "longInput": 2.5,
+    "longCache": 0.25,
+    "longOutput": 15,
+    "longInputThreshold": 200000,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "gemini-3-pro",
+    "match": "^gemini-3-pro",
+    "input": 2,
+    "cache": 0.2,
+    "output": 12,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "MiniMax-M2.7",
+    "match": "^MiniMax-M2\\.7",
+    "input": 0.3,
+    "cache": 0.06,
+    "cacheWrite": 0.375,
+    "output": 1.2,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  },
+  {
+    "model": "MiniMax-M2.5",
+    "match": "^MiniMax-M2\\.5|minimax-m2\\.5",
+    "input": 0.3,
+    "cache": 0.03,
+    "cacheWrite": 0.375,
+    "output": 1.2,
+    "source": "estimated",
+    "updatedAt": "2026-06-25"
+  }
+]

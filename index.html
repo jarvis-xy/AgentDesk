@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Ledger</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace" aria-label="Token Ledger dashboard">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">
+              <span class="status-dot"></span>
+              本地日志扫描器在线
+            </div>
+            <h1>Token Ledger</h1>
+            <p>统计这台电脑上 AI 编程工具的 token 消耗，只读取用量元数据。</p>
+          </div>
+          <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换浅色模式" title="切换浅色模式"></button>
+        </header>
+
+        <div class="scope-strip">
+          <nav class="segmented" aria-label="Usage scope">
+            <button class="segment active" type="button" data-scope="all">全电脑</button>
+          </nav>
+          <button class="ghost-button" type="button" id="rescan">重新扫描</button>
+        </div>
+
+        <section class="summary-panel">
+          <div class="panel-title">
+            <div>
+              <span class="section-label">Overview</span>
+              <h2 id="scope-title">全电脑 token 消耗</h2>
+            </div>
+            <div class="privacy-pill">
+              <span></span>
+              不上传代码 / 对话 / 文件路径
+            </div>
+          </div>
+
+          <div class="metrics-grid" id="metrics"></div>
+
+          <div class="trend-grid">
+            <article class="chart-panel trend-panel">
+              <div class="chart-head">
+                <div>
+                  <span class="section-label">Daily Trend</span>
+                  <h3>每日 token 消耗趋势</h3>
+                </div>
+                <div class="trend-scan">
+                  <span>最近扫描</span>
+                  <strong id="trend-total">--:--</strong>
+                </div>
+              </div>
+              <div class="bar-scroll" id="bar-scroll">
+                <div class="bar-chart" id="bars"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="secondary-grid">
+            <article class="chart-panel" id="tool-panel">
+              <div class="chart-head">
+                <div>
+                  <span class="section-label">Tool Share</span>
+                  <h3>工具占比</h3>
+                </div>
+              </div>
+              <div class="share-list" id="tool-share"></div>
+            </article>
+
+            <article class="glass-card" id="calendar-panel">
+              <div class="heatmap-months" id="heatmap-months"></div>
+              <div class="heatmap" id="heatmap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="model-section">
+          <article class="glass-card" id="model-panel">
+            <div class="card-head">
+              <div>
+                <span class="section-label">Model Mix</span>
+                <h3>模型消耗分布</h3>
+              </div>
+              <button class="ghost-button model-toggle" type="button" id="model-toggle">展开全部</button>
+            </div>
+            <div class="model-list" id="model-list"></div>
+          </article>
+        </section>
+
+        <section class="activity-panel">
+          <div class="card-head">
+            <div>
+              <span class="section-label">Recent Activity</span>
+              <h3>按天明细</h3>
+            </div>
+          </div>
+          <div class="activity-table" id="activity"></div>
+        </section>
+
+        <section class="diagnostics-panel">
+          <div class="card-head">
+            <div>
+              <span class="section-label">Scanner Diagnostics</span>
+              <h3>扫描诊断</h3>
+            </div>
+          </div>
+          <div class="diagnostics-grid" id="diagnostics"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

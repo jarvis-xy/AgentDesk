@@ -1,0 +1,25 @@
+{
+  "name": "token-ledger",
+  "version": "1.0.0",
+  "description": "Local-first AI coding token usage dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build:mac": "pkg . --targets node18-macos-x64,node18-macos-arm64 --out-path dist",
+    "build:win": "pkg . --targets node18-win-x64 --out-path dist"
+  },
+  "bin": "server.js",
+  "pkg": {
+    "assets": [
+      "index.html",
+      "app.js",
+      "styles.css",
+      "pricing.json"
+    ]
+  },
+  "author": "Token Ledger contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}
