@@ -53,6 +53,13 @@ Token Ledger 是本地优先工具：
 - Node.js 18 或更高版本
 - macOS、Linux 或 Windows
 
+从 GitHub 下载项目并进入目录：
+
+```bash
+git clone https://github.com/jarvis-xy/token-ledger.git
+cd token-ledger
+```
+
 安装依赖：
 
 ```bash
@@ -75,19 +82,34 @@ http://127.0.0.1:5188
 
 ## 如何使用
 
-1. 启动本地服务：
+1. 首次使用时，先下载项目并进入目录：
+
+```bash
+git clone https://github.com/jarvis-xy/token-ledger.git
+cd token-ledger
+```
+
+已经下载过项目时，只需在 `token-ledger` 目录中继续以下步骤。
+
+2. 安装依赖（首次使用或更新依赖后执行）：
+
+```bash
+npm install
+```
+
+3. 启动本地服务：
 
 ```bash
 npm start
 ```
 
-2. 打开本地面板：
+4. 打开本地面板：
 
 ```text
 http://127.0.0.1:5188
 ```
 
-3. 等待首次扫描完成。扫描器会读取本机支持工具的 token 用量元数据，并展示：
+5. 等待首次扫描完成。扫描器会读取本机支持工具的 token 用量元数据，并展示：
 
 - 全量历史 token
 - 最近一天 token
@@ -99,7 +121,7 @@ http://127.0.0.1:5188
 - 按天明细
 - 扫描诊断
 
-4. 当你需要刷新数据时，点击页面里的 `重新扫描`。
+6. 当你需要刷新数据时，点击页面里的 `重新扫描`。
 
 5. 使用顶部工具切换栏，可以查看全电脑数据，也可以单独查看 Codex、OpenClaw、Claude Code、Hermes 等工具的数据。
 

@@ -52,6 +52,13 @@ Requirements:
 - Node.js 18 or later
 - macOS, Linux, or Windows
 
+Clone the repository and enter the project folder:
+
+```bash
+git clone https://github.com/jarvis-xy/token-ledger.git
+cd token-ledger
+```
+
 Install dependencies:
 
 ```bash
@@ -74,19 +81,34 @@ Force a rescan from the UI with the `重新扫描` button.
 
 ## How to Use
 
-1. Start the local server:
+1. On first use, clone the repository and enter the project folder:
+
+```bash
+git clone https://github.com/jarvis-xy/token-ledger.git
+cd token-ledger
+```
+
+If you already cloned it, continue from inside the `token-ledger` folder.
+
+2. Install dependencies on first use or after dependency updates:
+
+```bash
+npm install
+```
+
+3. Start the local server:
 
 ```bash
 npm start
 ```
 
-2. Open the dashboard:
+4. Open the dashboard:
 
 ```text
 http://127.0.0.1:5188
 ```
 
-3. Wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
+5. Wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
 
 - total historical token usage
 - latest day usage
@@ -98,7 +120,7 @@ http://127.0.0.1:5188
 - daily details
 - scanner diagnostics
 
-4. Click `重新扫描` when you want to refresh the local data.
+6. Click `重新扫描` when you want to refresh the local data.
 
 5. Use the tool tabs at the top to switch between all-computer usage and a single tool such as Codex, OpenClaw, Claude Code, or Hermes.
 
