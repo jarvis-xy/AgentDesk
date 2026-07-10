@@ -72,6 +72,82 @@ http://127.0.0.1:5188
 
 Force a rescan from the UI with the `重新扫描` button.
 
+## How to Use
+
+1. Start the local server:
+
+```bash
+npm start
+```
+
+2. Open the dashboard:
+
+```text
+http://127.0.0.1:5188
+```
+
+3. Wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
+
+- total historical token usage
+- latest day usage
+- active usage days
+- estimated cost
+- daily trend
+- tool share
+- model usage distribution
+- daily details
+- scanner diagnostics
+
+4. Click `重新扫描` when you want to refresh the local data.
+
+5. Use the tool tabs at the top to switch between all-computer usage and a single tool such as Codex, OpenClaw, Claude Code, or Hermes.
+
+6. Hover over daily trend bars to inspect that day's usage details.
+
+7. Expand `模型消耗分布` to see all detected model usage.
+
+8. Check `扫描诊断` when a tool looks missing or the result differs from another tracker. Diagnostics show record counts, scan rules, skipped records, and source-level details.
+
+## Common Workflows
+
+### Check Today's Usage
+
+Open the dashboard and look at `最近一天 token`. For detailed per-tool usage, scroll to `按天明细`.
+
+### Update Pricing
+
+Edit [pricing.json](pricing.json), then restart the local server:
+
+```bash
+npm start
+```
+
+Prices are USD per 1M tokens.
+
+### Force a Fresh Scan
+
+Use the dashboard button, or call the local API:
+
+```text
+http://127.0.0.1:5188/api/usage?refresh=1
+```
+
+### Run on Another Port
+
+```bash
+PORT=5199 npm start
+```
+
+Then open:
+
+```text
+http://127.0.0.1:5199
+```
+
+### Stop the Server
+
+Press `Ctrl+C` in the terminal running `npm start`.
+
 ## Cost Estimation
 
 Token Ledger estimates cost with:
