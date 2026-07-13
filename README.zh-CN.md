@@ -55,7 +55,7 @@ Token Ledger 是本地优先工具：
 将下面这一整句话复制给 Codex、Claude Code 或其他有终端权限的 AI 助手：
 
 ```text
-请在我的电脑上安装并启动 Token Ledger（https://github.com/jarvis-xy/token-ledger）：确认 Node.js 18+ 可用，将仓库克隆到合适目录，安装依赖并启动服务，最后在浏览器打开 http://127.0.0.1:5188；它只在本机读取 AI 工具的 Token 用量元数据，不上传代码或对话。
+请在我的电脑上安装并启动 Token Ledger（https://github.com/jarvis-xy/token-ledger）：确认 Node.js 18+ 可用，将仓库克隆到合适目录，安装依赖并启动服务，最后在浏览器打开 http://127.0.0.1:5188；它只在本机读取 AI 工具的 Token 用量基础数据，不上传代码或对话。
 ```
 
 ### 方式二：手动安装
