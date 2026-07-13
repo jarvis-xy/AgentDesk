@@ -11,7 +11,7 @@ Token Ledger 是一个本地优先的 AI 编程 Token 消耗统计面板。
 - 本地网页面板：`http://127.0.0.1:5188`
 - 不需要云端账号
 - 不上传遥测数据
-- 只扫描本地用量元数据
+- 只扫描本地用量基础数据
 - 每日 token 消耗趋势
 - 工具占比
 - 模型消耗分布
@@ -32,8 +32,8 @@ Token Ledger 是一个本地优先的 AI 编程 Token 消耗统计面板。
 
 实验性或受限支持：
 
-- Gemini CLI：只有在本地存在 token 元数据时才会统计。没有发现 token 元数据时，不应该理解为“用量为 0”。
-- Cursor、Trae 等 IDE：只有在工具本身暴露本地 token 元数据时，才能进行准确统计。
+- Gemini CLI：只有在本地存在 token 基础数据时才会统计。没有发现 token 基础数据时，不应该理解为“用量为 0”。
+- Cursor、Trae 等 IDE：只有在工具本身暴露本地 token 基础数据时，才能进行准确统计。
 
 ## 隐私说明
 
@@ -42,7 +42,7 @@ Token Ledger 是本地优先工具：
 - 不上传代码
 - 不上传提示词或对话
 - 不上传文件路径
-- 只读取模型名称、时间戳、输入 token、缓存 token、输出 token、总 token 等用量元数据
+- 只读取模型名称、时间戳、输入 token、缓存 token、输出 token、总 token 等用量基础数据
 
 详细说明见 [docs/privacy.md](docs/privacy.md)。
 
