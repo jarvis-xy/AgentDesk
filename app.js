@@ -351,7 +351,7 @@ function renderActivity(data) {
   }, new Map()).entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([tool]) => tool);
-  const gridColumns = `108px 130px repeat(${toolColumns.length}, minmax(120px, 1fr)) 110px 110px 110px`;
+  const gridColumns = `108px 130px repeat(${toolColumns.length}, minmax(120px, 1fr)) 110px 110px 110px 110px`;
   activityEl.style.setProperty("--activity-columns", gridColumns);
 
   const header = document.createElement("div");
@@ -361,6 +361,7 @@ function renderActivity(data) {
     <strong>合计 token</strong>
     ${toolColumns.map((tool) => `<span title="${tool}">${tool}</span>`).join("")}
     <span>输入 token</span>
+    <span>缓存 token</span>
     <span>输出 token</span>
     <em>预估成本</em>
   `;
@@ -374,6 +375,7 @@ function renderActivity(data) {
       <strong>${formatTokens(day.tokens)}</strong>
       ${toolColumns.map((tool) => `<span>${day.tools[tool] ? formatTokens(day.tools[tool]) : "-"}</span>`).join("")}
       <span>${formatTokens(day.inputTokens || 0)}</span>
+      <span>${formatTokens(day.cacheTokens || 0)}</span>
       <span>${formatTokens(day.outputTokens || 0)}</span>
       <em>${formatCost(day.cost)}</em>
     `;
