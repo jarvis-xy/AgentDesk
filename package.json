@@ -2,6 +2,13 @@
   "name": "token-ledger",
   "version": "1.0.0",
   "description": "Local-first AI coding token usage dashboard",
+  "keywords": [
+    "ai",
+    "codex",
+    "claude-code",
+    "token-usage",
+    "local-first"
+  ],
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -19,6 +26,17 @@
   },
   "author": "Token Ledger contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarvis-xy/token-ledger.git"
+  },
+  "homepage": "https://github.com/jarvis-xy/token-ledger#readme",
+  "bugs": {
+    "url": "https://github.com/jarvis-xy/token-ledger/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "pkg": "^5.8.1"
   }

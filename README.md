@@ -45,70 +45,47 @@ Token Ledger is local-first:
 
 See [docs/privacy.md](docs/privacy.md) for details.
 
-## Quick Start
+## Install and Start
 
-Requirements:
+Token Ledger runs on macOS, Linux, and Windows, and requires Node.js 18 or later. Choose one option:
 
-- Node.js 18 or later
-- macOS, Linux, or Windows
+### Option 1: Ask an AI assistant to install it (recommended)
 
-Clone the repository and enter the project folder:
+Copy this complete sentence into Codex, Claude Code, or another AI assistant with terminal access:
 
-```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
+```text
+Please install and start Token Ledger (https://github.com/jarvis-xy/token-ledger) on my computer: confirm that Node.js 18+ is available, clone the repository into an appropriate folder, install dependencies, start the service, and open http://127.0.0.1:5188 in a browser. It must only read local AI-tool token usage metadata and must not upload code or conversations.
 ```
 
-Install dependencies:
+### Option 2: Install it manually
+
+Run this one command in a terminal:
 
 ```bash
-npm install
+git clone https://github.com/jarvis-xy/token-ledger.git && cd token-ledger && npm install && npm start
 ```
 
-Start the local server:
+If `git clone` reports `Failed to connect to github.com port 443`, your current network or proxy cannot reach GitHub's Git service; this is not a Token Ledger installation error. Use this verified source-archive fallback instead:
 
 ```bash
-npm start
+mkdir -p ~/Applications && cd ~/Applications && curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip && unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger && cd token-ledger && npm install && npm start
 ```
 
-Open:
+Your browser should open automatically after the first scan. If it does not, visit:
 
 ```text
 http://127.0.0.1:5188
 ```
 
-Force a rescan from the UI with the `重新扫描` button.
+Already installed? Run the following from the `token-ledger` folder:
+
+```bash
+npm start
+```
 
 ## How to Use
 
-1. On first use, clone the repository and enter the project folder:
-
-```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
-```
-
-If you already cloned it, continue from inside the `token-ledger` folder.
-
-2. Install dependencies on first use or after dependency updates:
-
-```bash
-npm install
-```
-
-3. Start the local server:
-
-```bash
-npm start
-```
-
-4. Open the dashboard:
-
-```text
-http://127.0.0.1:5188
-```
-
-5. Wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
+After starting the app, wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
 
 - total historical token usage
 - latest day usage
@@ -120,15 +97,13 @@ http://127.0.0.1:5188
 - daily details
 - scanner diagnostics
 
-6. Click `重新扫描` when you want to refresh the local data.
+Click `重新扫描` when you want to refresh the local data.
 
-5. Use the tool tabs at the top to switch between all-computer usage and a single tool such as Codex, OpenClaw, Claude Code, or Hermes.
+Use the tool tabs at the top to switch between all-computer usage and a single tool such as Codex, OpenClaw, Claude Code, or Hermes.
 
-6. Hover over daily trend bars to inspect that day's usage details.
+Hover over daily trend bars to inspect that day's usage details, and expand `模型消耗分布` to see all detected model usage.
 
-7. Expand `模型消耗分布` to see all detected model usage.
-
-8. Check `扫描诊断` when a tool looks missing or the result differs from another tracker. Diagnostics show record counts, scan rules, skipped records, and source-level details.
+Check `扫描诊断` when a tool looks missing or the result differs from another tracker. Diagnostics show record counts, scan rules, skipped records, and source-level details.
 
 ## Common Workflows
 

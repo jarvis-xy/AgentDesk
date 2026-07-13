@@ -46,70 +46,47 @@ Token Ledger 是本地优先工具：
 
 详细说明见 [docs/privacy.md](docs/privacy.md)。
 
-## 快速开始
+## 安装与启动
 
-环境要求：
+支持 macOS、Linux 和 Windows，需要 Node.js 18 或更高版本。请选择一种方式：
 
-- Node.js 18 或更高版本
-- macOS、Linux 或 Windows
+### 方式一：让 AI 帮你安装（推荐）
 
-从 GitHub 下载项目并进入目录：
+将下面这一整句话复制给 Codex、Claude Code 或其他有终端权限的 AI 助手：
 
-```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
+```text
+请在我的电脑上安装并启动 Token Ledger（https://github.com/jarvis-xy/token-ledger）：确认 Node.js 18+ 可用，将仓库克隆到合适目录，安装依赖并启动服务，最后在浏览器打开 http://127.0.0.1:5188；它只在本机读取 AI 工具的 Token 用量元数据，不上传代码或对话。
 ```
 
-安装依赖：
+### 方式二：手动安装
+
+在终端执行下面一行命令：
 
 ```bash
-npm install
+git clone https://github.com/jarvis-xy/token-ledger.git && cd token-ledger && npm install && npm start
 ```
 
-启动本地服务：
+如果 `git clone` 报 `Failed to connect to github.com port 443`，说明当前网络或代理无法连接 GitHub 的 Git 服务，不是 Token Ledger 的安装错误。可改用已验证的源码包下载方式：
 
 ```bash
-npm start
+mkdir -p ~/Applications && cd ~/Applications && curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip && unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger && cd token-ledger && npm install && npm start
 ```
 
-打开：
+首次扫描完成后，浏览器会自动打开；若没有自动打开，请访问：
 
 ```text
 http://127.0.0.1:5188
 ```
 
-如果要重新扫描，在页面点击 `重新扫描`。
+已经安装过？进入项目目录后只需执行：
+
+```bash
+npm start
+```
 
 ## 如何使用
 
-1. 首次使用时，先下载项目并进入目录：
-
-```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
-```
-
-已经下载过项目时，只需在 `token-ledger` 目录中继续以下步骤。
-
-2. 安装依赖（首次使用或更新依赖后执行）：
-
-```bash
-npm install
-```
-
-3. 启动本地服务：
-
-```bash
-npm start
-```
-
-4. 打开本地面板：
-
-```text
-http://127.0.0.1:5188
-```
-
-5. 等待首次扫描完成。扫描器会读取本机支持工具的 token 用量元数据，并展示：
+启动后等待首次扫描完成。扫描器会读取本机支持工具的 token 用量元数据，并展示：
 
 - 全量历史 token
 - 最近一天 token
@@ -121,15 +98,13 @@ http://127.0.0.1:5188
 - 按天明细
 - 扫描诊断
 
-6. 当你需要刷新数据时，点击页面里的 `重新扫描`。
+当你需要刷新数据时，点击页面里的 `重新扫描`。
 
-5. 使用顶部工具切换栏，可以查看全电脑数据，也可以单独查看 Codex、OpenClaw、Claude Code、Hermes 等工具的数据。
+使用顶部工具切换栏，可以查看全电脑数据，也可以单独查看 Codex、OpenClaw、Claude Code、Hermes 等工具的数据。
 
-6. 鼠标悬浮到每日趋势柱上，可以查看当天的用量详情。
+鼠标悬浮到每日趋势柱上，可以查看当天的用量详情；在 `模型消耗分布` 中点击展开，可以查看所有检测到的模型消耗。
 
-7. 在 `模型消耗分布` 中点击展开，可以查看所有检测到的模型消耗。
-
-8. 如果某个工具没有数据，或者和其他统计工具不一致，查看 `扫描诊断`。这里会展示记录数、扫描规则、跳过原因和数据源明细。
+如果某个工具没有数据，或者和其他统计工具不一致，查看 `扫描诊断`。这里会展示记录数、扫描规则、跳过原因和数据源明细。
 
 ## 常见使用场景
 
