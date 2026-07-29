@@ -209,13 +209,54 @@ function walk(dir, predicate, limit = 5000) {
   return files;
 }
 
-function readJsonLines(file, visitor) {
-  let text = "";
-  try {
-    text = fs.readFileSync(file, "utf8");
-  } catch {
-    return { lines: 0, parsed: 0 };
+let cachedZstdBin = undefined;
+function resolveZstdBin() {
+  if (cachedZstdBin !== undefined) return cachedZstdBin;
+  const candidates = [
+    process.env.ZSTD_BIN,
+    "zstd",
+    "/opt/homebrew/bin/zstd",
+    "/usr/local/bin/zstd",
+    "/usr/bin/zstd",
+  ].filter(Boolean);
+  for (const cand of candidates) {
+    try {
+      execFileSync(cand, ["--version"], { stdio: "ignore" });
+      cachedZstdBin = cand;
+      return cachedZstdBin;
+    } catch {
+      // try next
+    }
   }
+  cachedZstdBin = null;
+  return null;
+}
+
+/** Read plain .jsonl or .jsonl.zst (Codex archived_sessions) into UTF-8 text. */
+function readJsonlFileText(file) {
+  if (file.endsWith(".zst")) {
+    const bin = resolveZstdBin();
+    if (!bin) return { text: "", error: "zstd_not_found" };
+    try {
+      const buf = execFileSync(bin, ["-dc", file], {
+        maxBuffer: 512 * 1024 * 1024,
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      return { text: buf.toString("utf8") };
+    } catch {
+      return { text: "", error: "zstd_decompress_failed" };
+    }
+  }
+  try {
+    return { text: fs.readFileSync(file, "utf8") };
+  } catch {
+    return { text: "", error: "read_failed" };
+  }
+}
+
+function readJsonLines(file, visitor) {
+  const { text, error } = readJsonlFileText(file);
+  if (!text) return { lines: 0, parsed: 0, error: error || null };
   let parsed = 0;
   const lines = text.split(/\r?\n/);
   for (const line of lines) {
@@ -227,7 +268,7 @@ function readJsonLines(file, visitor) {
       // Ignore malformed lines; logs can be partially written.
     }
   }
-  return { lines: lines.length, parsed };
+  return { lines: lines.length, parsed, error: null };
 }
 
 function usageTotal(usage) {
@@ -380,6 +421,8 @@ function summarizeRecordDiagnostics(source) {
     dateRule: source.diagnostics?.dateRule || "按日志事件 timestamp 转本机本地日期归属",
     tokenRule: source.diagnostics?.tokenRule || "读取用量元数据，不解析代码或对话正文",
     dedupeRule: source.diagnostics?.dedupeRule || "按请求、消息或 token 组成去重",
+    coverageNote: source.diagnostics?.coverageNote || null,
+    codexCoverage: source.diagnostics?.codexCoverage || null,
     skipped: source.diagnostics?.skipped || {},
     sourceKinds: [...byKind.entries()].map(([name, records]) => ({ name, records })),
     recentDays: [...byDay.values()]
@@ -608,32 +651,91 @@ function claudeUsage() {
   };
 }
 
+function codexRolloutBasename(file) {
+  // rollout-....jsonl or rollout-....jsonl.zst → stable key for dedupe across live/archive
+  return path.basename(file).replace(/\.zst$/i, "");
+}
+
 function codexSessionFiles() {
-  const current = walk(path.join(HOME, ".codex", "sessions"), (file) => file.endsWith(".jsonl"), 20000);
-  const byName = new Map(current.map((file) => [path.basename(file), file]));
+  const byName = new Map();
+  const liveRoot = path.join(HOME, ".codex", "sessions");
+  const archRoot = path.join(HOME, ".codex", "archived_sessions");
+
+  const live = walk(
+    liveRoot,
+    (file) => file.endsWith(".jsonl") && !file.endsWith(".zst"),
+    20000,
+  );
+  for (const file of live) {
+    byName.set(codexRolloutBasename(file), { file, kind: "live" });
+  }
+
+  // Codex archives older rollouts as zstd: *.jsonl.zst (previously missed by scanner).
   const archived = walk(
-    path.join(HOME, ".codex", "archived_sessions"),
-    (file) => file.endsWith(".jsonl"),
+    archRoot,
+    (file) => file.endsWith(".jsonl") || file.endsWith(".jsonl.zst"),
     20000,
   );
   for (const file of archived) {
-    if (!byName.has(path.basename(file))) byName.set(path.basename(file), file);
+    const key = codexRolloutBasename(file);
+    if (!byName.has(key)) byName.set(key, { file, kind: "archived" });
   }
+
   return [...byName.values()];
 }
 
+function codexSessionIndexStats() {
+  const indexPath = path.join(HOME, ".codex", "session_index.jsonl");
+  let lines = 0;
+  const ids = new Set();
+  if (!fs.existsSync(indexPath)) {
+    return { path: indexPath, lines: 0, uniqueIds: 0 };
+  }
+  try {
+    const text = fs.readFileSync(indexPath, "utf8");
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.trim()) continue;
+      lines += 1;
+      try {
+        const row = JSON.parse(line);
+        if (row && row.id) ids.add(String(row.id));
+      } catch {
+        // ignore
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return { path: indexPath.replace(HOME, "~"), lines, uniqueIds: ids.size };
+}
+
 function codexUsage() {
-  const files = codexSessionFiles();
+  const fileEntries = codexSessionFiles();
   const records = [];
   let parsedLines = 0;
+  let liveFiles = 0;
+  let archivedFiles = 0;
+  let zstFiles = 0;
+  let zstOk = 0;
+  let zstFail = 0;
+  const indexStats = codexSessionIndexStats();
   const diagnostics = createScanStats({
-    tokenRule: "读取 Codex event_msg token_count.info.last_token_usage",
-    dedupeRule: "同一会话文件内按 model + input + cache + output + reasoning + total 去重",
+    tokenRule:
+      "读取 Codex event_msg token_count.info.last_token_usage（单次调用）；会话累计见 total_token_usage",
+    dedupeRule:
+      "同一会话文件内按 model + input + cache + output + reasoning + total 去重，去掉重复 token 快照",
+    coverageNote:
+      "仅统计本机 ~/.codex 会话落盘。Codex App 账号总用量可能含已删除会话、其他设备/账号，与本机扫描不必一致。",
   });
 
-  for (const file of files) {
+  for (const { file, kind } of fileEntries) {
+    if (kind === "live") liveFiles += 1;
+    else archivedFiles += 1;
+    if (file.endsWith(".zst")) zstFiles += 1;
+
     let currentModel = "codex-unknown";
     const seenTokenCounts = new Set();
+    const sessionKey = codexRolloutBasename(file).replace(/\.jsonl$/i, "");
     const stat = readJsonLines(file, (entry) => {
       if (entry.type === "session_meta" && entry.payload && entry.payload.model) {
         currentModel = entry.payload.model;
@@ -677,32 +779,58 @@ function codexUsage() {
         return;
       }
       seenTokenCounts.add(dedupeKey);
-      records.push(usageEvent({
-        tool: "Codex",
-        model: currentModel,
-        date: dayFromTimestamp(entry.timestamp),
-        tokens,
-        inputTokens: Math.max(0, safeNumber(usage.input_tokens) - safeNumber(usage.cached_input_tokens)),
-        cacheTokens: safeNumber(usage.cached_input_tokens),
-        cacheReadTokens: safeNumber(usage.cached_input_tokens),
-        outputTokens: safeNumber(usage.output_tokens) + safeNumber(usage.reasoning_output_tokens),
-        sessionId: path.basename(file, ".jsonl"),
-        requestId: payload.info && payload.info.request_id,
-        messageId: "",
-        status: "token_count",
-        sourceFile: file,
-        sourceKind: "primary",
-        timestamp: entry.timestamp,
-      }));
+      records.push(
+        usageEvent({
+          tool: "Codex",
+          model: currentModel,
+          date: dayFromTimestamp(entry.timestamp),
+          tokens,
+          inputTokens: Math.max(0, safeNumber(usage.input_tokens) - safeNumber(usage.cached_input_tokens)),
+          cacheTokens: safeNumber(usage.cached_input_tokens),
+          cacheReadTokens: safeNumber(usage.cached_input_tokens),
+          outputTokens: safeNumber(usage.output_tokens) + safeNumber(usage.reasoning_output_tokens),
+          sessionId: sessionKey,
+          requestId: payload.info && payload.info.request_id,
+          messageId: "",
+          status: "token_count",
+          sourceFile: file,
+          sourceKind: kind === "archived" ? "archived" : "primary",
+          timestamp: entry.timestamp,
+        }),
+      );
     });
-    parsedLines += stat.parsed;
+    if (stat.error) {
+      addSkip(diagnostics, stat.error);
+      if (file.endsWith(".zst")) zstFail += 1;
+    } else if (file.endsWith(".zst")) {
+      zstOk += 1;
+    }
+    parsedLines += stat.parsed || 0;
   }
+
+  const totalTokens = records.reduce((sum, r) => sum + safeNumber(r.tokens), 0);
+  diagnostics.codexCoverage = {
+    liveFiles,
+    archivedFiles,
+    zstFiles,
+    zstOk,
+    zstFail,
+    zstdBin: resolveZstdBin() || null,
+    sessionIndex: indexStats,
+    filesOnDisk: fileEntries.length,
+    records: records.length,
+    totalTokens,
+    gapHint:
+      indexStats.uniqueIds > fileEntries.length
+        ? `session_index 有 ${indexStats.uniqueIds} 个会话 id，本机仅 ${fileEntries.length} 个 rollout 文件；缺失会话无法计入（已删/未同步/其他设备）。`
+        : "本机 rollout 文件与 session_index 规模接近。",
+  };
 
   return {
     id: "codex",
     name: "Codex",
-    source: "~/.codex/sessions/**/*.jsonl + archived_sessions",
-    files: files.length,
+    source: "~/.codex/sessions/**/*.jsonl + archived_sessions/**/*.jsonl(.zst)",
+    files: fileEntries.length,
     parsedLines,
     records,
     diagnostics,

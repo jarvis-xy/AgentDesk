@@ -34,6 +34,26 @@ Supported tools often write repeated snapshots, checkpoints, retries, or reset f
 - Select the most relevant OpenClaw session version when primary, reset, and checkpoint files overlap.  
 - Avoid counting repeated Codex token snapshots inside the same session file.  
 
+## Codex local vs account UI
+
+Codex usage is scanned from **this machine only**:
+
+| Path | Content |
+|------|---------|
+| `~/.codex/sessions/**/*.jsonl` | Active rollouts |
+| `~/.codex/archived_sessions/**/*.jsonl` and `*.jsonl.zst` | Archived rollouts (zstd) |
+
+Accounting: sum `event_msg` → `token_count` → `info.last_token_usage` (per-turn), deduped within each file by token composition.
+
+**Not equal to Codex App “累计 Token”** when:
+
+1. Sessions were deleted and not archived on disk  
+2. History exists only on OpenAI account / another device  
+3. Multiple ChatGPT / API accounts were used historically  
+4. `session_index.jsonl` lists more thread ids than rollout files still present  
+
+AgentDesk surfaces `diagnostics.codexCoverage` (live/archived file counts, session_index size, gap hint) so you can see coverage limits.  
+
 ## Cache Tokens
 
 Cache tokens are not a bug. They usually mean the provider reused context from previous calls.
