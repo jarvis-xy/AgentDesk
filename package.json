@@ -29,15 +29,15 @@
       "pricing.json"
     ]
   },
-  "author": "Token Ledger contributors",
+  "author": "AgentDesk contributors",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jarvis-xy/token-ledger.git"
+    "url": "git+https://github.com/jarvis-xy/AgentDesk.git"
   },
-  "homepage": "https://github.com/jarvis-xy/token-ledger#readme",
+  "homepage": "https://github.com/jarvis-xy/AgentDesk#readme",
   "bugs": {
-    "url": "https://github.com/jarvis-xy/token-ledger/issues"
+    "url": "https://github.com/jarvis-xy/AgentDesk/issues"
   },
   "engines": {
     "node": ">=18"

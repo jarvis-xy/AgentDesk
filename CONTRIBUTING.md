@@ -1,24 +1,25 @@
 # Contributing
 
-Contributions are welcome.
+Contributions to **AgentDesk** are welcome.
 
-## Good First Contributions
+Repo: https://github.com/jarvis-xy/AgentDesk
 
-- Add support for a new tool that exposes local token metadata.
-- Improve source-specific deduplication.
-- Add tests with sanitized sample usage records.
-- Improve documentation for pricing and statistics policy.
-- Improve UI accessibility.
+## Good first contributions
 
-## Scanner Rules
+- Add support for a new tool that exposes local token metadata  
+- Improve source-specific deduplication  
+- Add tests with sanitized sample usage records  
+- Improve documentation for pricing and statistics policy  
+- Improve Skills matrix / project inference UX  
+- Improve UI accessibility (dark / light)  
 
-Scanner contributions should follow these rules:
+## Scanner rules
 
-- Do not upload data.
-- Do not read source code or conversation text unless there is explicit user opt-in.
-- Prefer local usage metadata fields.
-- Return clear diagnostics when token metadata is unavailable.
-- Keep approximate estimates clearly labeled as estimates.
+- Do not upload data  
+- Do not read source code or conversation text unless there is explicit user opt-in  
+- Prefer local usage metadata fields  
+- Return clear diagnostics when token metadata is unavailable  
+- Keep approximate estimates clearly labeled as estimates  
 
 ## Development
 
@@ -33,11 +34,19 @@ Open:
 http://127.0.0.1:5188
 ```
 
-## Pull Request Checklist
+## Pull request checklist
 
-- The scanner does not upload local data.
-- The scanner does not require secrets.
-- The statistics policy is documented if behavior changes.
-- New prices are marked as official or estimated.
-- UI changes work in both dark and light mode.
+- [ ] Scanner does not upload local data  
+- [ ] Scanner does not require cloud secrets for basic local mode  
+- [ ] Statistics policy documented if behavior changes  
+- [ ] New prices marked `official` or `estimated`  
+- [ ] UI works in both dark and light mode  
+- [ ] Docs / README links use `https://github.com/jarvis-xy/AgentDesk`  
 
+## Product docs
+
+- [README.md](README.md) / [README.zh-CN.md](README.zh-CN.md)  
+- [docs/privacy.md](docs/privacy.md)  
+- [docs/statistics-policy.md](docs/statistics-policy.md)  
+- [docs/pricing.md](docs/pricing.md)  
+- [docs/PRD-agentdesk.md](docs/PRD-agentdesk.md)  

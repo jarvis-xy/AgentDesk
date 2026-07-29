@@ -1,39 +1,43 @@
 # Privacy
 
-Token Ledger is designed as a local-first usage dashboard.
+AgentDesk (formerly Token Ledger) is a **local-first** multi-agent ops desk.
 
 ## What It Reads
 
-The scanner reads local usage metadata exposed by supported tools. Depending on the tool, this can include:
+The scanner reads **local metadata** exposed by supported tools. Depending on the tool and feature, this can include:
 
-- Timestamp
-- Tool name
-- Model name
-- Input token count
-- Cache read token count
-- Cache write token count
-- Output token count
-- Reasoning token count
-- Total token count
-- Request or message identifiers used only for local deduplication
+### Usage
+
+- Timestamp  
+- Tool name  
+- Model name  
+- Input / cache read / cache write / output / reasoning token counts  
+- Total token count (when provided)  
+- Request or message identifiers used only for **local** deduplication  
+
+### Skills & sessions (paths only)
+
+- Skill directory paths and `SKILL.md` presence  
+- Session storage paths, cwd, and related path-level metadata for project inference  
+
+AgentDesk does **not** open project source files or conversation bodies for token estimation.
 
 ## What It Does Not Upload
 
-Token Ledger does not upload:
+AgentDesk does not upload:
 
-- Source code
-- Prompts
-- Assistant replies
-- Conversation content
-- Project file paths
-- Repository names
-- Local directory structures
+- Source code  
+- Prompts  
+- Assistant replies  
+- Conversation content  
+- Project file contents  
+- Telemetry to a cloud product backend  
 
 The dashboard and API run on `127.0.0.1` by default.
 
 ## Local API
 
-The local API is intended for the local browser only:
+Intended for the local browser only:
 
 ```text
 http://127.0.0.1:5188/api/usage
@@ -41,7 +45,14 @@ http://127.0.0.1:5188/api/usage
 
 If you expose the port to a network, you are responsible for access control.
 
-## Accuracy Boundaries
+## Local user data
 
-Token Ledger only reports what local tools record. If a tool does not store token metadata locally, Token Ledger should mark it as unsupported or unavailable instead of guessing from text.
+Optional labels and overrides are stored only under:
 
+```text
+~/.agentdesk/
+```
+
+## Accuracy boundaries
+
+AgentDesk only reports what local tools record. If a tool does not store token metadata locally, it should be marked unsupported or unavailable — not guessed from text.

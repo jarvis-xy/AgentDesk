@@ -1,76 +1,82 @@
 # AgentDesk
 
-> Formerly **Token Ledger**. Now a local multi-agent ops desk.  
-> Repository path stays `jarvis-xy/token-ledger` for continuity.
+[简体中文](README.zh-CN.md)
 
-[简体中文](README.zh-CN.md) · [PRD](docs/PRD-agentdesk.md)
+**AgentDesk** is a **local multi-agent ops desk**. It scans AI agent logs and configs on your own machine and surfaces:
 
-**AgentDesk** scans local AI agent logs and configs on your machine and surfaces:
+| Area | What you get |
+|------|----------------|
+| **Usage** | Tokens, estimated cost, tool & model mix |
+| **Projects** | History from session `cwd` / git, temp-task filtering, manual labels |
+| **Skills** | Install matrix across agents; copy or symlink sync |
 
-- **Usage** — tokens, estimated cost, tool/model mix (Claude Code, Codex, Grok, OpenClaw, Hermes, …)
-- **Projects** — history inferred from session `cwd` / git, with temp-task filtering and manual labels
-- **Skills** — multi-agent skill matrix, copy / symlink sync across agents
+Formerly **Token Ledger** (token-usage dashboard only). The product grew into a full local ops desk; the old GitHub path `jarvis-xy/token-ledger` redirects here.
 
-All local: `http://127.0.0.1:5188`. No cloud account, no telemetry, no upload of code or conversations.
+**Repo:** https://github.com/jarvis-xy/AgentDesk  
+**Dashboard:** `http://127.0.0.1:5188`  
+**Privacy:** no cloud account, no telemetry, no upload of code or conversations.
 
-## Features
+---
 
-- Local web dashboard
-- Usage dashboard (Token Ledger heritage)
-- Project graph + overrides under `~/.agentdesk/`
-- Skill install matrix and cross-agent sync
-- Input / cache / output token breakdown
-- Cost estimate from `pricing.json`
-- Dark / light mode
-- Manual rescan
-- LaunchAgent-friendly (does not force-open a browser on every wake)
+## Screens / navigation
 
-## Supported sources (usage)
+| Tab | Role |
+|-----|------|
+| **Overview** | Today cost, real projects, skill coverage |
+| **Usage** | Daily trend, tool share, model distribution, detail table |
+| **Projects** | Project graph + labels (`~/.agentdesk/project-overrides.json`) |
+| **Skills** | Multi-agent skill matrix + sync (copy / symlink) |
 
-- Codex
-- Claude Code
-- Grok CLI (when local usage metadata exists)
-- OpenClaw
-- Hermes
+## Supported usage sources
 
-Experimental / limited: Gemini CLI, Cursor, Trae — only when local token metadata is present.
+- Codex  
+- Claude Code  
+- Grok CLI (when local usage metadata exists)  
+- OpenClaw  
+- Hermes  
 
-## Privacy
+**Limited / experimental:** Gemini CLI, Cursor, Trae — only when the tool exposes local token metadata. Missing metadata is *not* “zero usage”.
 
-Local-first:
+## Privacy (local-first)
 
-- Does not upload code, prompts, conversations, or project file contents
-- Reads local usage metadata (model, timestamp, token counters) and skill/session path metadata
-- Project labels you set are stored only under `~/.agentdesk/`
+AgentDesk:
 
-See [docs/privacy.md](docs/privacy.md).
+- Does **not** upload source code, prompts, conversations, or file contents  
+- Reads local **usage metadata** (model, timestamps, token counters) and **skill/session path metadata**  
+- Stores optional project labels only under `~/.agentdesk/`  
 
-## Install and start
+Details: [docs/privacy.md](docs/privacy.md) · [docs/statistics-policy.md](docs/statistics-policy.md) · [docs/pricing.md](docs/pricing.md)
 
-Requires **Node.js 18+**.
+---
 
-### Option 1: Ask an AI assistant
+## Install & start
+
+Requires **Node.js 18+** (macOS, Linux, Windows).
+
+### Option 1 — Ask an AI assistant
+
+Copy this into Claude Code, Codex, Grok CLI, or any agent with terminal access:
 
 ```text
-Please install and start AgentDesk / Token Ledger (https://github.com/jarvis-xy/token-ledger) on my computer: confirm Node.js 18+, clone the repo, npm install, start the service, open http://127.0.0.1:5188. It must only read local AI-tool metadata and must not upload code or conversations.
+Please install and start AgentDesk (https://github.com/jarvis-xy/AgentDesk) on my computer: confirm Node.js 18+ is available, clone the repository into an appropriate folder, run npm install, start the service, and open http://127.0.0.1:5188. It must only read local AI-tool metadata and must not upload code or conversations.
 ```
 
-### Option 2: Manual
+### Option 2 — Manual
 
 ```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
+git clone https://github.com/jarvis-xy/AgentDesk.git
+cd AgentDesk
 npm install
 npm start
 ```
 
-If `git clone` cannot reach GitHub, use the zipball fallback:
+If `git clone` cannot reach GitHub (e.g. port 443 blocked), use the zipball fallback:
 
 ```bash
 mkdir -p ~/Applications && cd ~/Applications
-curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip
-unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger
-cd token-ledger && npm install && npm start
+curl -L https://api.github.com/repos/jarvis-xy/AgentDesk/zipball/main -o agentdesk.zip
+unzip -q agentdesk.zip && mv jarvis-xy-AgentDesk-* AgentDesk
+cd AgentDesk && npm install && npm start
 ```
 
 Open:
@@ -79,25 +85,60 @@ Open:
 http://127.0.0.1:5188
 ```
 
-Already installed? From the project folder:
+Already installed?
 
 ```bash
+cd AgentDesk && npm start
+```
+
+### Optional: run in background (macOS LaunchAgent)
+
+A sample plist lives at `com.tokenledger.local.plist` (legacy filename). Prefer **not** auto-opening the browser on every wake; set `NO_OPEN=1` or use the project’s documented LaunchAgent pattern so restarts don’t spam windows.
+
+---
+
+## Skill sync (quick tip)
+
+- **Claude / Cursor** skills are often discovered by Grok automatically.  
+- **Codex** (and other trees outside Grok’s default scan) → use the **Skills** tab to soft-link into `~/.grok/skills`, or:
+
+```bash
+mkdir -p ~/.grok/skills
+ln -sfn ~/.codex/skills/<name> ~/.grok/skills/<name>
+```
+
+---
+
+## Configuration & data
+
+| Item | Location |
+|------|----------|
+| Pricing table | `pricing.json` (USD per 1M tokens) |
+| Project overrides | `~/.agentdesk/project-overrides.json` |
+| Theme (UI) | browser `localStorage` |
+
+Edit `pricing.json` and restart to refresh cost estimates. See [docs/pricing.md](docs/pricing.md).
+
+## Development
+
+```bash
+npm install
 npm start
 ```
 
-## Navigation
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-| Tab | Role |
-|-----|------|
-| Overview | Today cost, real projects, skill coverage |
-| Usage | Token Ledger-style spend board |
-| Projects | Project graph + labels |
-| Skills | Install matrix + sync (copy / symlink) |
-
-## Skill sync tip
-
-Claude / Cursor skills are often already discovered by Grok. For Codex and other trees, use the Skills tab to soft-link into `~/.grok/skills`, or symlink manually.
+Product background (Chinese): [docs/PRD-agentdesk.md](docs/PRD-agentdesk.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE)
+
+## Rename note
+
+| | |
+|--|--|
+| **Product name** | AgentDesk |
+| **Former name** | Token Ledger |
+| **GitHub** | https://github.com/jarvis-xy/AgentDesk |
+| **Old URL** | https://github.com/jarvis-xy/token-ledger → redirects to AgentDesk |

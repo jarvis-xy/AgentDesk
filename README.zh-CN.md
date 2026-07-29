@@ -1,92 +1,143 @@
 # AgentDesk
 
-> 原名 **Token Ledger**。现升级为本地多 Agent 运维台。  
-> GitHub 仓库仍为 [jarvis-xy/token-ledger](https://github.com/jarvis-xy/token-ledger)（兼容旧链接）。
+[English](README.md)
 
-[English](README.md) · [产品 PRD](docs/PRD-agentdesk.md)
+**AgentDesk** 是跑在本机的 **多 Agent 运维台**：扫描各 AI Agent 的本地日志与配置，统一呈现：
 
-**AgentDesk** 扫描本机 AI Agent 的日志与配置，统一呈现：
+| 模块 | 你能看到什么 |
+|------|----------------|
+| **用量** | Token、预估成本、工具与模型占比 |
+| **项目** | 从会话 cwd / git 推断历史项目，过滤临时任务，可手动标注 |
+| **能力** | 多 Agent Skill 矩阵；复制 / 软链同步 |
 
-- **用量** Token / 成本 / 工具与模型占比（Claude、Codex、Grok、OpenClaw、Hermes…）
-- **项目** 从会话 cwd / git 推断历史项目，过滤临时任务，可手动分类
-- **能力** 多 Agent Skill 矩阵，复制 / 软链同步
+原名 **Token Ledger**（仅 Token 统计）。产品已升级为完整运维台；旧仓库路径 `jarvis-xy/token-ledger` 会重定向到本仓库。
 
-全部本地运行：`http://127.0.0.1:5188`，不上传代码、对话或遥测。
+**仓库：** https://github.com/jarvis-xy/AgentDesk  
+**面板：** `http://127.0.0.1:5188`  
+**隐私：** 无云账号、无遥测，不上传代码或对话。
 
-## 功能
+---
 
-- 本地网页面板
-- 用量看板（继承 Token Ledger）
-- 项目图谱 + `~/.agentdesk/` 标注
-- Skill 安装矩阵与跨 Agent 同步
-- 输入 / 缓存 / 输出 token 拆分
-- 基于 `pricing.json` 的预估成本
-- 深色 / 浅色模式
-- 手动重新扫描
-- 适合 LaunchAgent（不在每次唤醒时强弹浏览器）
+## 界面导航
 
-## 支持的数据源（用量）
+| 页 | 说明 |
+|----|------|
+| **总览** | 今日成本、正式项目、Skill 覆盖 |
+| **用量** | 日趋势、工具占比、模型分布、明细表 |
+| **项目** | 项目图谱 + 标注（`~/.agentdesk/project-overrides.json`） |
+| **能力** | Skill 安装矩阵与跨 Agent 同步 |
 
-- Codex
-- Claude Code
-- Grok CLI（本地有用量元数据时）
-- OpenClaw
-- Hermes
+## 支持的用量数据源
 
-实验性 / 受限：Gemini CLI、Cursor、Trae — 仅当本地存在 token 元数据时。
+- Codex  
+- Claude Code  
+- Grok CLI（本地有用量元数据时）  
+- OpenClaw  
+- Hermes  
 
-## 隐私
+**实验性 / 受限：** Gemini CLI、Cursor、Trae — 仅当工具暴露本地 token 元数据时。没有元数据 ≠ 用量为 0。
 
-- 不上传代码、提示词、对话、项目文件内容
-- 只读用量元数据与 skill/会话路径元信息
-- 用户项目标注仅写入 `~/.agentdesk/`
+## 隐私（本地优先）
 
-详见 [privacy.md](docs/privacy.md)。
+AgentDesk：
+
+- **不**上传源码、提示词、对话、文件内容  
+- 只读本机 **用量元数据**（模型、时间戳、token 计数）与 **skill/会话路径元信息**  
+- 项目标注仅写入 `~/.agentdesk/`  
+
+详见：[docs/privacy.md](docs/privacy.md) · [docs/statistics-policy.md](docs/statistics-policy.md) · [docs/pricing.md](docs/pricing.md)
+
+---
 
 ## 安装与启动
 
-需要 **Node.js 18+**。
+需要 **Node.js 18+**（macOS / Linux / Windows）。
 
 ### 方式一：让 AI 安装
 
+把下面整段复制给 Claude Code、Codex、Grok CLI 等有终端权限的助手：
+
 ```text
-请在我的电脑上安装并启动 AgentDesk / Token Ledger（https://github.com/jarvis-xy/token-ledger）：确认 Node.js 18+ 可用，克隆仓库，npm install 并启动，打开 http://127.0.0.1:5188；只读本机 AI 工具元数据，不上传代码或对话。
+请在我的电脑上安装并启动 AgentDesk（https://github.com/jarvis-xy/AgentDesk）：确认 Node.js 18+ 可用，将仓库克隆到合适目录，执行 npm install 并启动服务，最后打开 http://127.0.0.1:5188。它只读本机 AI 工具元数据，不上传代码或对话。
 ```
 
-### 方式二：手动
+### 方式二：手动安装
 
 ```bash
-git clone https://github.com/jarvis-xy/token-ledger.git
-cd token-ledger
+git clone https://github.com/jarvis-xy/AgentDesk.git
+cd AgentDesk
 npm install
 npm start
 ```
 
-无法 `git clone` 时可用源码包：
+若 `git clone` 连不上 GitHub，可用源码包：
 
 ```bash
 mkdir -p ~/Applications && cd ~/Applications
-curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip
-unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger
-cd token-ledger && npm install && npm start
+curl -L https://api.github.com/repos/jarvis-xy/AgentDesk/zipball/main -o agentdesk.zip
+unzip -q agentdesk.zip && mv jarvis-xy-AgentDesk-* AgentDesk
+cd AgentDesk && npm install && npm start
 ```
 
-访问：`http://127.0.0.1:5188`  
-已安装则在项目目录执行 `npm start`。
+浏览器访问：
 
-## 主导航
+```text
+http://127.0.0.1:5188
+```
 
-| 页 | 说明 |
+已安装：
+
+```bash
+cd AgentDesk && npm start
+```
+
+### 可选：后台常驻（macOS LaunchAgent）
+
+仓库内示例 `com.tokenledger.local.plist` 为历史文件名。建议 **不要** 在每次唤醒时自动弹浏览器，避免窗口刷屏。
+
+---
+
+## Skill 同步（速记）
+
+- **Claude / Cursor** 的 skill，多数可被 Grok 直接发现。  
+- **Codex** 等不在默认扫描路径时，用 **能力** 页软链到 `~/.grok/skills`，或：
+
+```bash
+mkdir -p ~/.grok/skills
+ln -sfn ~/.codex/skills/<name> ~/.grok/skills/<name>
+```
+
+---
+
+## 配置与数据
+
+| 项 | 位置 |
 |----|------|
-| 总览 | 今日成本、正式项目、Skill 覆盖 |
-| 用量 | 原 Token Ledger 看板 |
-| 项目 | 历史项目图谱 + 标注 |
-| 能力 | Skill 安装矩阵与跨 Agent 同步 |
+| 价格表 | `pricing.json`（USD / 百万 token） |
+| 项目标注 | `~/.agentdesk/project-overrides.json` |
+| 主题 | 浏览器 `localStorage` |
 
-## Skill 同步
+改 `pricing.json` 后重启服务。说明见 [docs/pricing.md](docs/pricing.md)。
 
-Claude / Cursor 的 skill 多数可被 Grok 直接发现。Codex 等可用「能力」页软链到 `~/.grok/skills`，或手动 `ln -s`。
+## 开发
+
+```bash
+npm install
+npm start
+```
+
+贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)  
+产品背景：[docs/PRD-agentdesk.md](docs/PRD-agentdesk.md)
 
 ## License
 
-MIT — 见 [LICENSE](LICENSE)。
+[MIT](LICENSE)
+
+## 更名说明
+
+| | |
+|--|--|
+| **产品名** | AgentDesk |
+| **曾用名** | Token Ledger |
+| **GitHub** | https://github.com/jarvis-xy/AgentDesk |
+| **旧地址** | https://github.com/jarvis-xy/token-ledger → 重定向到 AgentDesk |
