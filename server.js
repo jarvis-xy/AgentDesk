@@ -656,29 +656,40 @@ function codexRolloutBasename(file) {
   return path.basename(file).replace(/\.zst$/i, "");
 }
 
+function isCodexRolloutFile(file) {
+  // Active and compressed rollouts: *.jsonl and *.jsonl.zst (Codex compresses
+  // older sessions both under sessions/ and archived_sessions/).
+  const base = path.basename(file);
+  if (!base.startsWith("rollout-") && !base.endsWith(".jsonl") && !base.endsWith(".jsonl.zst")) {
+    // still allow any *.jsonl / *.jsonl.zst under session trees
+  }
+  return (
+    (file.endsWith(".jsonl") && !file.endsWith(".zst")) ||
+    file.endsWith(".jsonl.zst")
+  );
+}
+
 function codexSessionFiles() {
   const byName = new Map();
   const liveRoot = path.join(HOME, ".codex", "sessions");
   const archRoot = path.join(HOME, ".codex", "archived_sessions");
 
-  const live = walk(
-    liveRoot,
-    (file) => file.endsWith(".jsonl") && !file.endsWith(".zst"),
-    20000,
-  );
+  // IMPORTANT: Codex stores many historical sessions as *.jsonl.zst *inside*
+  // ~/.codex/sessions/YYYY/MM/DD/ (not only under archived_sessions/).
+  const live = walk(liveRoot, isCodexRolloutFile, 50000);
   for (const file of live) {
-    byName.set(codexRolloutBasename(file), { file, kind: "live" });
+    byName.set(codexRolloutBasename(file), {
+      file,
+      kind: file.endsWith(".zst") ? "sessions-zst" : "live",
+    });
   }
 
-  // Codex archives older rollouts as zstd: *.jsonl.zst (previously missed by scanner).
-  const archived = walk(
-    archRoot,
-    (file) => file.endsWith(".jsonl") || file.endsWith(".jsonl.zst"),
-    20000,
-  );
+  const archived = walk(archRoot, isCodexRolloutFile, 50000);
   for (const file of archived) {
     const key = codexRolloutBasename(file);
-    if (!byName.has(key)) byName.set(key, { file, kind: "archived" });
+    if (!byName.has(key)) {
+      byName.set(key, { file, kind: "archived" });
+    }
   }
 
   return [...byName.values()];
@@ -714,6 +725,7 @@ function codexUsage() {
   const records = [];
   let parsedLines = 0;
   let liveFiles = 0;
+  let sessionsZstFiles = 0;
   let archivedFiles = 0;
   let zstFiles = 0;
   let zstOk = 0;
@@ -725,11 +737,14 @@ function codexUsage() {
     dedupeRule:
       "同一会话文件内按 model + input + cache + output + reasoning + total 去重，去掉重复 token 快照",
     coverageNote:
-      "仅统计本机 ~/.codex 会话落盘。Codex App 账号总用量可能含已删除会话、其他设备/账号，与本机扫描不必一致。",
+      "仅统计本机 ~/.codex 会话落盘（含 sessions 与 archived 下的 .jsonl / .jsonl.zst）。" +
+      "换过 ChatGPT/Codex 账号时，旧账号若曾在本机产生会话，文件通常仍在同一目录，不按账号分桶；" +
+      "但 App 里「当前账号累计」来自云端，与本机文件集不必一致。",
   });
 
   for (const { file, kind } of fileEntries) {
     if (kind === "live") liveFiles += 1;
+    else if (kind === "sessions-zst") sessionsZstFiles += 1;
     else archivedFiles += 1;
     if (file.endsWith(".zst")) zstFiles += 1;
 
@@ -794,7 +809,8 @@ function codexUsage() {
           messageId: "",
           status: "token_count",
           sourceFile: file,
-          sourceKind: kind === "archived" ? "archived" : "primary",
+          sourceKind:
+            kind === "archived" ? "archived" : kind === "sessions-zst" ? "sessions-zst" : "primary",
           timestamp: entry.timestamp,
         }),
       );
@@ -810,7 +826,8 @@ function codexUsage() {
 
   const totalTokens = records.reduce((sum, r) => sum + safeNumber(r.tokens), 0);
   diagnostics.codexCoverage = {
-    liveFiles,
+    livePlainJsonl: liveFiles,
+    sessionsZstFiles,
     archivedFiles,
     zstFiles,
     zstOk,
@@ -820,16 +837,19 @@ function codexUsage() {
     filesOnDisk: fileEntries.length,
     records: records.length,
     totalTokens,
+    multiAccountNote:
+      "本机 ~/.codex 不按 OpenAI 账号分目录。历史登录过的账号若在本机跑过会话，rollout 仍可能在；" +
+      "已卸载/清理/从未落盘的账号用量无法恢复。App「累计 Token」是当前登录账号的云端账单视角。",
     gapHint:
       indexStats.uniqueIds > fileEntries.length
-        ? `session_index 有 ${indexStats.uniqueIds} 个会话 id，本机仅 ${fileEntries.length} 个 rollout 文件；缺失会话无法计入（已删/未同步/其他设备）。`
-        : "本机 rollout 文件与 session_index 规模接近。",
+        ? `session_index 有 ${indexStats.uniqueIds} 个会话 id，本机可解析 ${fileEntries.length} 个 rollout；其余已无文件。`
+        : `本机可解析 ${fileEntries.length} 个 rollout（含 sessions 内 zst 压缩会话）。`,
   };
 
   return {
     id: "codex",
     name: "Codex",
-    source: "~/.codex/sessions/**/*.jsonl + archived_sessions/**/*.jsonl(.zst)",
+    source: "~/.codex/sessions/**/*.{jsonl,jsonl.zst} + archived_sessions/**/*.{jsonl,jsonl.zst}",
     files: fileEntries.length,
     parsedLines,
     records,
