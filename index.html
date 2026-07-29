@@ -3,116 +3,299 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Token Ledger</title>
+    <title>AgentDesk · 本地多 Agent 运维台</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="shell">
-      <section class="workspace" aria-label="Token Ledger dashboard">
+      <section class="workspace" aria-label="AgentDesk dashboard">
         <header class="topbar">
           <div>
             <div class="eyebrow">
               <span class="status-dot"></span>
-              本地日志扫描器在线
+              本地运维台在线 · 原 Token Ledger
             </div>
-            <h1>Token Ledger</h1>
-            <p>统计这台电脑上 AI 编程工具的 token 消耗，只读取用量基础数据。</p>
+            <h1>AgentDesk</h1>
+            <p>本地多 Agent 运维台：用量 · 项目 · 能力，全部来自本机文件。</p>
           </div>
           <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换浅色模式" title="切换浅色模式"></button>
         </header>
 
-        <div class="scope-strip">
-          <nav class="segmented" aria-label="Usage scope">
-            <button class="segment active" type="button" data-scope="all">全电脑</button>
-          </nav>
-          <button class="ghost-button" type="button" id="rescan">重新扫描</button>
-        </div>
+        <nav class="product-tabs" aria-label="主导航">
+          <button class="product-tab active" type="button" data-product="overview">总览</button>
+          <button class="product-tab" type="button" data-product="usage">用量</button>
+          <button class="product-tab" type="button" data-product="projects">项目</button>
+          <button class="product-tab" type="button" data-product="skills">能力</button>
+        </nav>
 
-        <section class="summary-panel">
-          <div class="panel-title">
-            <div>
-              <span class="section-label">Overview</span>
-              <h2 id="scope-title">全电脑 token 消耗</h2>
+        <!-- Overview -->
+        <div id="product-overview" class="product-view">
+          <div class="scope-strip">
+            <div class="skills-toolbar">
+              <span class="muted-inline">基于本机日志与配置的实时快照</span>
             </div>
-            <div class="privacy-pill">
-              <span></span>
-              不上传代码 / 对话 / 文件路径
+            <button class="ghost-button" type="button" id="overview-rescan">刷新总览</button>
+          </div>
+          <section class="summary-panel">
+            <div class="panel-title">
+              <div>
+                <span class="section-label">Overview</span>
+                <h2>本机 Agent 态势</h2>
+              </div>
+              <div class="privacy-pill"><span></span>不上传代码 / 对话</div>
             </div>
-          </div>
-
-          <div class="metrics-grid" id="metrics"></div>
-
-          <div class="trend-grid">
-            <article class="chart-panel trend-panel">
-              <div class="chart-head">
+            <div class="metrics-grid" id="overview-metrics"></div>
+          </section>
+          <div class="secondary-grid overview-grid">
+            <article class="glass-card">
+              <div class="card-head">
                 <div>
-                  <span class="section-label">Daily Trend</span>
-                  <h3>每日 token 消耗趋势</h3>
-                </div>
-                <div class="trend-scan">
-                  <span>最近扫描</span>
-                  <strong id="trend-total">--:--</strong>
+                  <span class="section-label">Projects</span>
+                  <h3>最近正式项目</h3>
                 </div>
               </div>
-              <div class="bar-scroll" id="bar-scroll">
-                <div class="bar-chart" id="bars"></div>
-              </div>
+              <div class="simple-list" id="overview-projects"></div>
             </article>
-          </div>
-
-          <div class="secondary-grid">
-            <article class="chart-panel" id="tool-panel">
-              <div class="chart-head">
+            <article class="glass-card">
+              <div class="card-head">
                 <div>
-                  <span class="section-label">Tool Share</span>
-                  <h3>工具占比</h3>
+                  <span class="section-label">Tools</span>
+                  <h3>用量 Top Agent</h3>
                 </div>
               </div>
-              <div class="share-list" id="tool-share"></div>
-            </article>
-
-            <article class="glass-card" id="calendar-panel">
-              <div class="heatmap-months" id="heatmap-months"></div>
-              <div class="heatmap" id="heatmap"></div>
+              <div class="share-list" id="overview-tools"></div>
             </article>
           </div>
-        </section>
-
-        <section class="model-section">
-          <article class="glass-card" id="model-panel">
+          <section class="glass-card overview-agents-card">
             <div class="card-head">
               <div>
-                <span class="section-label">Model Mix</span>
-                <h3>模型消耗分布</h3>
+                <span class="section-label">Skills footprint</span>
+                <h3>各 Agent 能力安装量</h3>
               </div>
-              <button class="ghost-button model-toggle" type="button" id="model-toggle">展开全部</button>
             </div>
-            <div class="model-list" id="model-list"></div>
-          </article>
-        </section>
+            <div class="agent-chip-row" id="overview-agents"></div>
+          </section>
+        </div>
 
-        <section class="activity-panel">
-          <div class="card-head">
-            <div>
-              <span class="section-label">Recent Activity</span>
-              <h3>按天明细</h3>
-            </div>
+        <!-- Usage (legacy tokens) -->
+        <div id="product-usage" class="product-view" hidden>
+          <div class="scope-strip">
+            <nav class="segmented" aria-label="Usage scope">
+              <button class="segment active" type="button" data-scope="all">全电脑</button>
+            </nav>
+            <button class="ghost-button" type="button" id="rescan">重新扫描</button>
           </div>
-          <div class="activity-table" id="activity"></div>
-        </section>
 
-        <section class="diagnostics-panel">
-          <div class="card-head">
-            <div>
-              <span class="section-label">Scanner Diagnostics</span>
-              <h3>扫描诊断</h3>
+          <section class="summary-panel">
+            <div class="panel-title">
+              <div>
+                <span class="section-label">Usage</span>
+                <h2 id="scope-title">全电脑 token 消耗</h2>
+              </div>
+              <div class="privacy-pill"><span></span>只读本地用量元数据</div>
             </div>
+            <div class="metrics-grid" id="metrics"></div>
+            <div class="trend-grid">
+              <article class="chart-panel trend-panel">
+                <div class="chart-head">
+                  <div>
+                    <span class="section-label">Daily Trend</span>
+                    <h3>每日 token 消耗趋势</h3>
+                  </div>
+                  <div class="trend-scan">
+                    <span>最近扫描</span>
+                    <strong id="trend-total">--:--</strong>
+                  </div>
+                </div>
+                <div class="bar-scroll" id="bar-scroll">
+                  <div class="bar-chart" id="bars"></div>
+                </div>
+              </article>
+            </div>
+            <div class="secondary-grid">
+              <article class="chart-panel" id="tool-panel">
+                <div class="chart-head">
+                  <div>
+                    <span class="section-label">Tool Share</span>
+                    <h3>工具占比</h3>
+                  </div>
+                </div>
+                <div class="share-list" id="tool-share"></div>
+              </article>
+              <article class="glass-card" id="calendar-panel">
+                <div class="heatmap-months" id="heatmap-months"></div>
+                <div class="heatmap" id="heatmap"></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="model-section">
+            <article class="glass-card" id="model-panel">
+              <div class="card-head">
+                <div>
+                  <span class="section-label">Model Mix</span>
+                  <h3>模型消耗分布</h3>
+                </div>
+                <button class="ghost-button model-toggle" type="button" id="model-toggle">展开全部</button>
+              </div>
+              <div class="model-list" id="model-list"></div>
+            </article>
+          </section>
+
+          <section class="activity-panel">
+            <div class="card-head">
+              <div>
+                <span class="section-label">Recent Activity</span>
+                <h3>按天明细</h3>
+              </div>
+            </div>
+            <div class="activity-table" id="activity"></div>
+          </section>
+
+          <section class="diagnostics-panel">
+            <div class="card-head">
+              <div>
+                <span class="section-label">Scanner Diagnostics</span>
+                <h3>扫描诊断</h3>
+              </div>
+            </div>
+            <div class="diagnostics-grid" id="diagnostics"></div>
+          </section>
+        </div>
+
+        <!-- Projects -->
+        <div id="product-projects" class="product-view" hidden>
+          <div class="scope-strip">
+            <div class="skills-toolbar">
+              <input class="skills-search" id="projects-search" type="search" placeholder="搜索项目名、路径或总结…" autocomplete="off" />
+              <select class="kind-select" id="projects-kind-filter" aria-label="按类型筛选">
+                <option value="all">全部类型</option>
+                <option value="ai_coding">AI 编程</option>
+                <option value="content">内容创作</option>
+                <option value="media">媒体视频</option>
+                <option value="ops">Agent/运维</option>
+                <option value="research">调研学习</option>
+                <option value="other">其他</option>
+                <option value="temp">临时任务</option>
+                <option value="unknown">未分类</option>
+              </select>
+              <label class="skills-filter-check">
+                <input type="checkbox" id="projects-hide-temp" checked />
+                隐藏临时
+              </label>
+              <label class="skills-filter-check">
+                <input type="checkbox" id="projects-hide-unknown" />
+                隐藏未知
+              </label>
+            </div>
+            <button class="ghost-button" type="button" id="projects-rescan">重新扫描项目</button>
           </div>
-          <div class="diagnostics-grid" id="diagnostics"></div>
-        </section>
+          <section class="summary-panel">
+            <div class="panel-title">
+              <div>
+                <span class="section-label">Projects</span>
+                <h2 id="projects-title">历史项目图谱</h2>
+              </div>
+              <div class="privacy-pill"><span></span>多 Agent 会话 cwd 全量扫描 · 可手动纠正</div>
+            </div>
+            <div class="metrics-grid" id="projects-metrics"></div>
+            <div class="agent-chip-row" id="projects-source-stats"></div>
+          </section>
+          <section class="glass-card projects-panel">
+            <div class="card-head">
+              <div>
+                <span class="section-label">Inventory</span>
+                <h3>项目列表与一句话总结</h3>
+              </div>
+              <p class="skills-hint">点击项目查看会话与用量；标注写入 ~/.agentdesk/</p>
+            </div>
+            <div class="projects-table" id="projects-table"></div>
+          </section>
+
+          <section class="glass-card project-detail-panel" id="project-detail-panel" hidden>
+            <div class="card-head">
+              <div>
+                <span class="section-label">Detail</span>
+                <h3 id="project-detail-title">项目详情</h3>
+              </div>
+              <button class="ghost-button" type="button" id="project-detail-close">关闭</button>
+            </div>
+            <p class="skills-action-desc" id="project-detail-summary"></p>
+            <div class="metrics-grid" id="project-detail-metrics"></div>
+            <div class="secondary-grid project-detail-grid">
+              <article class="glass-card nested-card">
+                <div class="card-head">
+                  <div>
+                    <span class="section-label">Usage</span>
+                    <h3>关联用量</h3>
+                  </div>
+                </div>
+                <p class="detail-note" id="project-usage-note"></p>
+                <div class="share-list" id="project-usage-tools"></div>
+                <div class="model-list" id="project-usage-models"></div>
+                <div class="simple-list" id="project-usage-days"></div>
+              </article>
+              <article class="glass-card nested-card">
+                <div class="card-head">
+                  <div>
+                    <span class="section-label">Sessions</span>
+                    <h3>会话历史</h3>
+                  </div>
+                </div>
+                <div class="sessions-list" id="project-sessions"></div>
+              </article>
+            </div>
+            <div class="agent-chip-row" id="project-related-skills"></div>
+          </section>
+        </div>
+
+        <!-- Skills -->
+        <div id="product-skills" class="product-view" hidden>
+          <div class="scope-strip">
+            <div class="skills-toolbar">
+              <input class="skills-search" id="skills-search" type="search" placeholder="搜索名称 / 中文能力说明…" autocomplete="off" />
+              <select class="kind-select" id="skills-category-filter" aria-label="按能力分类">
+                <option value="all">全部分类</option>
+              </select>
+              <label class="skills-filter-check">
+                <input type="checkbox" id="skills-only-partial" />
+                仅显示未全覆盖
+              </label>
+            </div>
+            <button class="ghost-button" type="button" id="skills-rescan">重新扫描 Skills</button>
+          </div>
+
+          <section class="summary-panel">
+            <div class="panel-title">
+              <div>
+                <span class="section-label">Skills</span>
+                <h2 id="skills-title">多 Agent 能力清单</h2>
+              </div>
+              <div class="privacy-pill"><span></span>基于 SKILL.md 中文摘要与分类</div>
+            </div>
+            <div class="metrics-grid" id="skills-metrics"></div>
+            <div class="agent-chip-row" id="skills-agents"></div>
+            <div class="agent-chip-row" id="skills-categories"></div>
+          </section>
+
+          <section class="skills-matrix-panel glass-card">
+            <div class="card-head">
+              <div>
+                <span class="section-label">Catalog</span>
+                <h3>能力说明 · 分类 · 安装矩阵</h3>
+              </div>
+              <p class="skills-hint">同步：复制或软链；系统/bundled 只读</p>
+            </div>
+            <div class="skills-table-wrap">
+              <div class="skills-table" id="skills-table"></div>
+            </div>
+          </section>
+
+          <!-- 旧底部同步栏已移除：改为列表行内展开选择目标 Agent -->
+          <div id="skills-action-panel" hidden></div>
+        </div>
       </section>
     </main>
-
     <script src="./app.js"></script>
   </body>
 </html>

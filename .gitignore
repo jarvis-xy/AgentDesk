@@ -8,3 +8,7 @@ tmp/
 media-article-token-ledger.html
 com.tokenledger.local.plist
 
+
+# local marketing / media (not product)
+content/
+videos/

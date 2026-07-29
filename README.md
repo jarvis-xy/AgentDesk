@@ -1,213 +1,103 @@
-# Token Ledger
+# AgentDesk
 
-[简体中文](README.zh-CN.md)
+> Formerly **Token Ledger**. Now a local multi-agent ops desk.  
+> Repository path stays `jarvis-xy/token-ledger` for continuity.
 
-Token Ledger is a local-first dashboard for tracking AI coding token usage on your own computer.
+[简体中文](README.zh-CN.md) · [PRD](docs/PRD-agentdesk.md)
 
-It scans local usage metadata from supported AI coding tools, aggregates token usage by day, tool, and model, and estimates cost from a configurable price table. It is designed for users who want to understand AI coding spend without uploading code, prompts, conversations, or file paths.
+**AgentDesk** scans local AI agent logs and configs on your machine and surfaces:
+
+- **Usage** — tokens, estimated cost, tool/model mix (Claude Code, Codex, Grok, OpenClaw, Hermes, …)
+- **Projects** — history inferred from session `cwd` / git, with temp-task filtering and manual labels
+- **Skills** — multi-agent skill matrix, copy / symlink sync across agents
+
+All local: `http://127.0.0.1:5188`. No cloud account, no telemetry, no upload of code or conversations.
 
 ## Features
 
-- Local web dashboard at `http://127.0.0.1:5188`
-- No cloud account and no telemetry
-- Scans local usage metadata only
-- Daily token trend
-- Tool share
-- Model usage distribution
-- Daily detail table
-- Input, cache, output token breakdown
-- Estimated cost from `pricing.json`
-- Dark and light mode
+- Local web dashboard
+- Usage dashboard (Token Ledger heritage)
+- Project graph + overrides under `~/.agentdesk/`
+- Skill install matrix and cross-agent sync
+- Input / cache / output token breakdown
+- Cost estimate from `pricing.json`
+- Dark / light mode
 - Manual rescan
+- LaunchAgent-friendly (does not force-open a browser on every wake)
 
-## Supported Sources
-
-Current scanner support:
+## Supported sources (usage)
 
 - Codex
 - Claude Code
+- Grok CLI (when local usage metadata exists)
 - OpenClaw
 - Hermes
 
-Experimental or limited support:
-
-- Gemini CLI is detected only when local token metadata exists. If no token metadata is found, it should not be treated as zero usage.
-- Cursor, Trae, and similar IDEs can only be counted accurately if they expose local token usage metadata.
+Experimental / limited: Gemini CLI, Cursor, Trae — only when local token metadata is present.
 
 ## Privacy
 
-Token Ledger is local-first:
+Local-first:
 
-- It does not upload code.
-- It does not upload prompts or conversations.
-- It does not upload file paths.
-- It reads local usage metadata fields such as model name, timestamp, input tokens, cache tokens, output tokens, and total tokens.
+- Does not upload code, prompts, conversations, or project file contents
+- Reads local usage metadata (model, timestamp, token counters) and skill/session path metadata
+- Project labels you set are stored only under `~/.agentdesk/`
 
-See [docs/privacy.md](docs/privacy.md) for details.
+See [docs/privacy.md](docs/privacy.md).
 
-## Install and Start
+## Install and start
 
-Token Ledger runs on macOS, Linux, and Windows, and requires Node.js 18 or later. Choose one option:
+Requires **Node.js 18+**.
 
-### Option 1: Ask an AI assistant to install it (recommended)
-
-Copy this complete sentence into Codex, Claude Code, or another AI assistant with terminal access:
+### Option 1: Ask an AI assistant
 
 ```text
-Please install and start Token Ledger (https://github.com/jarvis-xy/token-ledger) on my computer: confirm that Node.js 18+ is available, clone the repository into an appropriate folder, install dependencies, start the service, and open http://127.0.0.1:5188 in a browser. It must only read local AI-tool token usage metadata and must not upload code or conversations.
+Please install and start AgentDesk / Token Ledger (https://github.com/jarvis-xy/token-ledger) on my computer: confirm Node.js 18+, clone the repo, npm install, start the service, open http://127.0.0.1:5188. It must only read local AI-tool metadata and must not upload code or conversations.
 ```
 
-### Option 2: Install it manually
-
-Run this one command in a terminal:
+### Option 2: Manual
 
 ```bash
-git clone https://github.com/jarvis-xy/token-ledger.git && cd token-ledger && npm install && npm start
+git clone https://github.com/jarvis-xy/token-ledger.git
+cd token-ledger
+npm install
+npm start
 ```
 
-If `git clone` reports `Failed to connect to github.com port 443`, your current network or proxy cannot reach GitHub's Git service; this is not a Token Ledger installation error. Use this verified source-archive fallback instead:
+If `git clone` cannot reach GitHub, use the zipball fallback:
 
 ```bash
-mkdir -p ~/Applications && cd ~/Applications && curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip && unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger && cd token-ledger && npm install && npm start
+mkdir -p ~/Applications && cd ~/Applications
+curl -L https://api.github.com/repos/jarvis-xy/token-ledger/zipball/main -o token-ledger.zip
+unzip -q token-ledger.zip && mv jarvis-xy-token-ledger-* token-ledger
+cd token-ledger && npm install && npm start
 ```
 
-Your browser should open automatically after the first scan. If it does not, visit:
+Open:
 
 ```text
 http://127.0.0.1:5188
 ```
 
-Already installed? Run the following from the `token-ledger` folder:
+Already installed? From the project folder:
 
 ```bash
 npm start
 ```
 
-## How to Use
+## Navigation
 
-After starting the app, wait for the first scan to complete. The scanner reads local usage metadata from supported tools and renders:
+| Tab | Role |
+|-----|------|
+| Overview | Today cost, real projects, skill coverage |
+| Usage | Token Ledger-style spend board |
+| Projects | Project graph + labels |
+| Skills | Install matrix + sync (copy / symlink) |
 
-- total historical token usage
-- latest day usage
-- active usage days
-- estimated cost
-- daily trend
-- tool share
-- model usage distribution
-- daily details
-- scanner diagnostics
+## Skill sync tip
 
-Click `重新扫描` when you want to refresh the local data.
-
-Use the tool tabs at the top to switch between all-computer usage and a single tool such as Codex, OpenClaw, Claude Code, or Hermes.
-
-Hover over daily trend bars to inspect that day's usage details, and expand `模型消耗分布` to see all detected model usage.
-
-Check `扫描诊断` when a tool looks missing or the result differs from another tracker. Diagnostics show record counts, scan rules, skipped records, and source-level details.
-
-## Common Workflows
-
-### Check Today's Usage
-
-Open the dashboard and look at `最近一天 token`. For detailed per-tool usage, scroll to `按天明细`.
-
-### Update Pricing
-
-Edit [pricing.json](pricing.json), then restart the local server:
-
-```bash
-npm start
-```
-
-Prices are USD per 1M tokens.
-
-### Force a Fresh Scan
-
-Use the dashboard button, or call the local API:
-
-```text
-http://127.0.0.1:5188/api/usage?refresh=1
-```
-
-### Run on Another Port
-
-```bash
-PORT=5199 npm start
-```
-
-Then open:
-
-```text
-http://127.0.0.1:5199
-```
-
-### Stop the Server
-
-Press `Ctrl+C` in the terminal running `npm start`.
-
-## Cost Estimation
-
-Token Ledger estimates cost with:
-
-```text
-cost = input_tokens * input_price
-     + cache_read_tokens * cache_read_price
-     + cache_write_tokens * cache_write_price
-     + output_tokens * output_price
-```
-
-All prices are stored in [pricing.json](pricing.json) and are expressed in USD per 1M tokens.
-
-Some models use official prices when known. Others are marked as estimated. Update the price table to match your provider contract.
-
-See [docs/pricing.md](docs/pricing.md).
-
-## Statistics Policy
-
-The preferred accounting policy is final effective calls:
-
-- Count only usage records with concrete token metadata.
-- Split input, cache read, cache write, output, and reasoning tokens where possible.
-- Deduplicate repeated snapshots, retries, and session checkpoint copies.
-- Bucket days by the local timezone.
-- Do not infer exact token usage by reading source code or conversations.
-
-See [docs/statistics-policy.md](docs/statistics-policy.md).
-
-## API
-
-The local server exposes:
-
-```text
-GET /api/usage
-GET /api/usage?refresh=1
-```
-
-`refresh=1` forces a fresh local scan.
-
-## Build
-
-This project currently uses `pkg` for experimental standalone binaries:
-
-```bash
-npm run build:mac
-npm run build:win
-```
-
-The primary open-source workflow is still `npm install && npm start`.
-
-## Project Structure
-
-```text
-.
-├── app.js
-├── index.html
-├── pricing.json
-├── server.js
-├── styles.css
-└── docs/
-```
+Claude / Cursor skills are often already discovered by Grok. For Codex and other trees, use the Skills tab to soft-link into `~/.grok/skills`, or symlink manually.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

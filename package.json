@@ -1,13 +1,18 @@
 {
-  "name": "token-ledger",
-  "version": "1.0.0",
-  "description": "Local-first AI coding token usage dashboard",
+  "name": "agentdesk",
+  "version": "1.3.0",
+  "description": "AgentDesk — local multi-agent ops desk (usage, skills, projects)",
   "keywords": [
+    "agentdesk",
+    "multi-agent",
+    "local-first",
+    "token-usage",
+    "skills",
+    "projects",
     "ai",
     "codex",
     "claude-code",
-    "token-usage",
-    "local-first"
+    "grok"
   ],
   "main": "server.js",
   "scripts": {
